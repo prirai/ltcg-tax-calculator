@@ -73,39 +73,58 @@ private:
     double initialCost;
     int initialYear;
     double sellingPrice;
+    double sellingPriceWithoutInflation;
     double netProfit;
+    double netProfitWithoutInflation;
 
 public:
     LTCG(double initial_cost, int initial_year, int size): growthPrice(size), inflationobj(size) {
         initialCost = initial_cost;
         initialYear = initial_year;
         sellingPrice = initial_cost;
+        sellingPriceWithoutInflation = initial_cost;
         netProfit = 0;
+        netProfitWithoutInflation = 0;
     }
 
     /**
-     * Calculates the selling price and LTCG tax applicable given the selling year.
+     * Calculates the selling price and Long Term Capital Gains (LTCG) tax applicable
+     * given the selling year.
      *
      * @param sell_year The year of selling.
      */
     void calculate(int sell_year) {
         double ltcg_tax = 0;
+        double ltcg_tax_without_inflation = 0;
         for (int i = initialYear; i < sell_year; i++) {
             double gp = growthPrice.getGrowthPrice(i);
             double inf = inflationobj.getInflationRate(i);
-            // Calculate the selling price
+            // Calculate the selling price using both the new and old schemes
             sellingPrice *= (1 + (gp - inf) / 100);
+            sellingPriceWithoutInflation *= (1 + gp / 100);
         }
         netProfit = sellingPrice - initialCost;
+        netProfitWithoutInflation = sellingPriceWithoutInflation - initialCost;
         // Precision as 2 decimal places.
         cout << setprecision(2);
+        cout << fixed << "Selling Price as per the new scheme (without inflation adjustment): " <<
+                sellingPriceWithoutInflation << endl;
+        cout << fixed << "Selling Price as per the old scheme (with inflation): " << sellingPrice << endl;
+        cout << fixed << "Profit as per the new change to LTCG scheme: " << netProfitWithoutInflation << endl;
         if (netProfit > 0) {
-            cout << "Net profit: " << netProfit << endl;
+            cout << "Net profit obtained when taking inflation into account: " << netProfit << endl;
             ltcg_tax = netProfit * 20 / 100;
         } else
-            cout << "No net profit (" << fixed << netProfit << "), therefore no LTCG tax applicable." << endl;
-        cout << fixed << "Selling Price: " << sellingPrice << endl;
-        cout << fixed << "LTCG Tax applicable: " << ltcg_tax << endl;
+            cout << "No net profit (" << fixed << netProfit <<
+                    "), therefore no LTCG tax applicable if following the old scheme with inflation." << endl;
+        ltcg_tax_without_inflation = netProfitWithoutInflation * 12.5 / 100;
+        cout << fixed << "LTCG Tax applicable as per the new scheme: " << ltcg_tax_without_inflation << endl;
+        cout << fixed << "LTCG Tax applicable as per the old scheme: " << ltcg_tax << endl;
+        double tax_difference = ltcg_tax_without_inflation - ltcg_tax;
+        if (tax_difference > 0)
+            cout << "Greater tax applicable as per the new scheme: " << tax_difference << endl;
+        else
+            cout << "Greater tax applicable as per the old scheme: " << -(tax_difference) << endl;
     }
 
     /**
