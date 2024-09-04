@@ -84,11 +84,13 @@ public:
         }
         profitBase = sellingPrice - initialCost;
         cout << setprecision(2);
-        if (profitBase > 0)
+        if (profitBase > 0) {
+            cout << "Net profit: " << profitBase << endl;
             ltcg_tax = profitBase * 20 / 100;
+        }
         else
             cout << "No net profit (", profitBase, ") , therefore no LTCG tax applicable." << endl;
-        cout << fixed <<     "Selling Price: " << sellingPrice << endl;
+        cout << fixed << "Selling Price: " << sellingPrice << endl;
         cout << fixed << "LTCG Tax applicable: " << ltcg_tax << endl;
     }
 
