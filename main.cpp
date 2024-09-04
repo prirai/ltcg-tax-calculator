@@ -1,40 +1,62 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <iomanip>
 
 using namespace std;
 
 class GrowthPrice {
 private:
-    vector<double> growthPrice;
+    double growthPrice[100];
+    int index;
+    int size;
+
 public:
-    void storeGrowthPrice(double growth_price) {
-        growthPrice.push_back(growth_price);
+    GrowthPrice(int size) {
+        this->size = size;
+        index = 0;
     }
+
+    void storeGrowthPrice(double growth_price) {
+        growthPrice[index++] = growth_price;
+    }
+
     double getGrowthPrice(int year) const {
         return growthPrice[year - 2001];
     }
 };
+
 class Inflation {
 private:
-    vector<double> inflationRate;
+    double inflationRate[100];
+    int index;
+    int size;
+
 public:
-    void storeInflationRate(double inflation_value) {
-        inflationRate.push_back(inflation_value);
+    Inflation(int size) {
+        this->size = size;
+        index = 0;
     }
+
+    void storeInflationRate(double inflation_value) {
+        inflationRate[index++] = inflation_value;
+    }
+
     double getInflationRate(int year) const {
         return inflationRate[year - 2001];
     }
 };
+
 class LTCG_Tax {
 private:
     double ltcgTax = 0;
+
 public:
     double getLTCGTax(double profit) {
         ltcgTax = profit * 20 / 100;
         return ltcgTax;
     }
 };
+
 class LTCG {
 private:
     GrowthPrice growthPrice;
@@ -44,23 +66,32 @@ private:
     int initialYear;
     double sellingPrice;
     double profitBase;
+
 public:
-    LTCG(int initial_cost, int initial_year) {
+    LTCG(double initial_cost, int initial_year, int size): growthPrice(size), inflationobj(size) {
         initialCost = initial_cost;
         initialYear = initial_year;
+        sellingPrice = initial_cost;
+        profitBase = 0;
     }
-    pair<double, double> calculate(int sell_year) {
-        sellingPrice = initialCost;
+
+    void calculate(int sell_year) {
+        double ltcg_tax = 0;
         for (int i = initialYear; i < sell_year; i++) {
             double gp = growthPrice.getGrowthPrice(i);
             double inf = inflationobj.getInflationRate(i);
-            sellingPrice *= (1 + (gp - inf)/100);
+            sellingPrice *= (1 + (gp - inf) / 100);
         }
         profitBase = sellingPrice - initialCost;
-        cout << "Profit: " << profitBase << endl;
-        double ltcg_tax = tax.getLTCGTax(profitBase);
-        return {sellingPrice, ltcg_tax};
+        cout << setprecision(2);
+        if (profitBase > 0)
+            ltcg_tax = profitBase * 20 / 100;
+        else
+            cout << "No net profit (", profitBase, ") , therefore no LTCG tax applicable." << endl;
+        cout << fixed <<     "Selling Price: " << sellingPrice << endl;
+        cout << fixed << "LTCG Tax applicable: " << ltcg_tax << endl;
     }
+
     void parseInput() {
         string text;
         ifstream input_file("price-inflation.csv");
@@ -75,18 +106,21 @@ public:
         input_file.close();
     }
 };
+
 int main() {
-    double costprice = 5000000;
-    int buyyear = 2011;
+    double costprice;
+    int buyyear;
+    cout << "Enter the cost price: ";
+    cin >> costprice;
+    cout << "Enter the year of purchase: ";
+    cin >> buyyear;
     int sellyear;
     cout << "Enter the year of selling (between " << buyyear << " and 2029): ";
     cin >> sellyear;
-    if (sellyear <= buyyear || sellyear >= 2030) {
+    if (sellyear < buyyear || sellyear >= 2030) {
         throw out_of_range("Year must be between " + to_string(buyyear) + " and 2029.");
     }
-    LTCG ltcg(costprice, buyyear);
+    LTCG ltcg(costprice, buyyear, 29);
     ltcg.parseInput();
-    auto [fst, snd] = ltcg.calculate(sellyear);
-    cout << fixed << "Selling Price: " << fst << endl;
-    cout << fixed << "LTCG Tax applicable: " << snd << endl;
+    ltcg.calculate(sellyear);
 }
