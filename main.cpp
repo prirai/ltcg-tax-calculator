@@ -11,7 +11,7 @@ private:
     int size;
 
 public:
-    GrowthPrice(int size) {
+    explicit GrowthPrice(int size) {
         this->size = size;
         index = 0;
     }
@@ -58,7 +58,7 @@ public:
      * @param profit The net profit.
      * @return The LTCG Tax applicable.
      */
-    double getLTCGTax(double profit) {
+    double getLTCGTax(const double profit) {
         // Calculate the LTCG Tax applicable
         ltcgTax = profit * 20 / 100;
         return ltcgTax;
