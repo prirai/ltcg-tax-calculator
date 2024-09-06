@@ -99,9 +99,10 @@ public:
         netProfit = sellingPrice - initialCost;
         // Precision as 2 decimal places.
         cout << setprecision(2);
+        cout << endl;
         if (netProfit > 0) {
-            cout << "Net profit: " << netProfit << endl;
-            ltcg_tax = netProfit * 20 / 100;
+            cout << "Net profit: " << fixed << netProfit << endl;
+            ltcg_tax = tax.getLTCGTax(netProfit);
         } else
             cout << "No net profit (" << fixed << netProfit << "), therefore no LTCG tax applicable." << endl;
         cout << fixed << "Selling Price: " << sellingPrice << endl;
@@ -129,6 +130,12 @@ public:
     }
 };
 
+void checkYearRange(int year, int lowerlim, int upperlim) {
+    if(year < lowerlim || year > upperlim) {
+        throw out_of_range("Year must be between " + to_string(lowerlim) + " and " + to_string(upperlim) + ".");
+    }
+}
+
 /**
  * Calculates the selling price and Long Term Capital Gains (LTCG) Tax applicable
  * given the selling year.
@@ -140,13 +147,12 @@ int main() {
     cin >> costprice;
     cout << "Enter the year of purchase: ";
     cin >> buyyear;
+    checkYearRange(buyyear, 2001, 2029);
     int sellyear;
     cout << "Enter the year of selling (between " << buyyear << " and 2029): ";
     cin >> sellyear;
     // Check the year of selling is in the valid range
-    if (sellyear < buyyear || sellyear >= 2030) {
-        throw out_of_range("Year must be between " + to_string(buyyear) + " and 2029.");
-    }
+    checkYearRange(sellyear, buyyear, 2030);
     LTCG ltcg(costprice, buyyear, 29);
     // Read the price-inflation.csv file and store the data in the member variables
     ltcg.parseInput();

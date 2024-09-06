@@ -3,7 +3,7 @@ Source Files for the OOPD Assignment 1
 
 ## Instructions for running
 - Running `make` or `make all` will compile both the versions of the program, i.e `ltcg_debug` meant for debugging and `ltcg_optimized` compiled using O2 flag.
-- Running `make clean` will cleanup the executables.
+- Running `make clean` will clean up the executables.
 - The file `main.cpp` contains the source of the program and `ltcg_debug` and `ltcg_optimized` are the executables.
 - The input file used for the program is `price-inflation.csv` which must be in the same directory as the executables.
 ## References Used
