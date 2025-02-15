@@ -1,5 +1,4 @@
-# oopd-a1
-Source Files for the OOPD Assignment 1
+# LTCG Tax Calculator
 
 ## Instructions for running
 - Running `make` or `make all` will compile both the versions of the program, i.e `ltcg_debug` meant for debugging using -g flag and `ltcg_optimized` compiled using O2 flag.
